@@ -1,4 +1,4 @@
-FILE_PATH = 'garden.json'
+FILE_PATH = 'garden.db'
 TABLE_WIDTH = 50
 
 RED = "\033[91m"

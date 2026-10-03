@@ -1,4 +1,4 @@
-from storage import load_garden, save_garden, export_to_txt
+from storage import load_garden, save_garden, export_to_txt, init_db
 from config import FILE_PATH, print_success, print_error
 from utils import get_int, clear_console, confirm_exit
 from garden import add_plant, search_plant, show_plants, delete_plant, edit_plant, plants_statistics, sort_plants 
@@ -6,7 +6,7 @@ from garden import add_plant, search_plant, show_plants, delete_plant, edit_plan
 
 def run():
     try:
-        garden = load_garden(FILE_PATH, [])
+        init_db()
         while True:
             print('\n---Меню---')
             print('1 - Добавить растение')
@@ -60,7 +60,6 @@ def run():
         save_garden(FILE_PATH, garden)
 
     except KeyboardInterrupt:
-        save_garden(FILE_PATH, garden)
         clear_console()
         print_error('Программа прервана!')
         print_success('\nДанные сохранены.')

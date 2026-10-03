@@ -1,23 +1,35 @@
-import json
-from config import TABLE_WIDTH, print_error, print_success
+import sqlite3
+from config import TABLE_WIDTH, print_success
 from utils import pause_and_clear, is_garden_empty, clear_console
 
 
-def load_garden(filepath, default):
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return default
+def connecting_db():
+    conn = sqlite3.connect('garden.db')
+    return conn
 
+def init_db():
+    with connecting_db() as conn:
+        conn.execute(
+    """
+    CREATE TABLE IF NOT EXISTS garden(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    quantity INTEGER NOT NULL,
+    date TEXT NOT NULL
+    )
+    """
+)
 
-def save_garden(filepath, garden):
-    try:
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(garden, f, ensure_ascii=False, indent=4)
-    except OSError:
-        print_error('Ошибка сохранения: диск переполнен или у вас нет прав!')
-
+def load_garden():
+    with connecting_db() as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, name, quantity, date FROM garden",
+        )
+        list_tuple = cursor.fetchall()
+        result = [dict(row) for row in list_tuple]
+    return result
 
 def export_to_txt(garden):
     if is_garden_empty(garden, 'нечего экспортировать'):

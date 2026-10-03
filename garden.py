@@ -1,7 +1,6 @@
 from datetime import datetime
 from config import print_info, TABLE_WIDTH, print_success, FILE_PATH, print_error
 from utils import clear_console, get_non_empty_string, get_positive_int, pause_and_clear, is_garden_empty, get_int
-from storage import save_garden
 
 def display_plants(garden):
     print_info('\nСписок растений в саду:')
@@ -19,7 +18,6 @@ def add_plant(garden):
     today = datetime.today().strftime('%d.%m.%Y')
     garden_dict = {'name': plant_name, 'quantity': plant_quantity, 'date': today}
     garden.append(garden_dict)
-    save_garden(FILE_PATH, garden)
     print_success('\nУспешно добавлено!')
     pause_and_clear()
 
@@ -61,7 +59,6 @@ def delete_plant(garden):
                 deleted_name = garden[index]['name']
                 del garden[index]
                 print_success(f"Растение '{deleted_name}' удалено.")
-                save_garden(FILE_PATH, garden)
                 break
             elif del_plants == 'нет':
                 break
@@ -88,14 +85,12 @@ def edit_plant(garden):
                                                'Нужно ввести новое названия растения!')
                 garden[idx]['name'] = up_name
                 print_success(f"Растение изменено на {up_name}.")
-                save_garden(FILE_PATH, garden)
                 break
             elif action == 2:
                 up_quantity = get_positive_int('Введите новое количество растения:',
                                                '\nНужно ввести количество растений!')
                 garden[idx]['quantity'] = up_quantity
                 print_success(f"Количество растения изменено на {up_quantity}")
-                save_garden(FILE_PATH, garden)
                 break
             else:
                 print_error('Введите "1" или "2" ')
@@ -115,7 +110,6 @@ def plants_statistics(garden):
     print(f'\nКоличество всех растений в саду: {total} шт.')
 
     max_plant = max(garden, key=lambda plant: plant['quantity'])
-    # Исправлены кавычки внутри f-строки (одинарные -> двойные или экранирование)
     print(f'\nСамое многочисленное растение в саду: {max_plant["name"]} - {max_plant["quantity"]} шт.')
 
     min_plant = min(garden, key=lambda plant: plant['quantity'])
