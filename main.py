@@ -1,5 +1,5 @@
-from storage import load_garden, save_garden, export_to_txt, init_db
-from config import FILE_PATH, print_success, print_error
+from storage import load_garden, export_to_txt, init_db
+from config import print_success, print_error
 from utils import get_int, clear_console, confirm_exit
 from garden import add_plant, search_plant, show_plants, delete_plant, edit_plant, plants_statistics, sort_plants 
 
@@ -21,43 +21,41 @@ def run():
 
             choice = get_int('\nВведите:')
             if choice == 1:
-                add_plant(garden)
+                add_plant()
                 continue
 
             elif choice == 2:
-                search_plant(garden)
+                search_plant()
                 continue
 
             elif choice == 3:
-                show_plants(garden)
+                show_plants()
                 continue
 
             elif choice == 4:
-                if delete_plant(garden):
+                if delete_plant():
                     continue
 
             elif choice == 5:
-                if edit_plant(garden):
+                if edit_plant():
                     continue
 
             elif choice == 6:
-                if plants_statistics(garden):
+                if plants_statistics():
                     continue
 
             elif choice == 7:
-                if sort_plants(garden):
+                if sort_plants():
                     continue
 
             elif choice == 8:
-                if export_to_txt(garden):
+                if export_to_txt():
                     continue
 
             elif choice == 0:
                 if confirm_exit():
                     print_success('\nПрограмма завершена')
                     break
-
-        save_garden(FILE_PATH, garden)
 
     except KeyboardInterrupt:
         clear_console()

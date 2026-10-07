@@ -1,6 +1,7 @@
 import os
 from config import print_error, BLUE, RESET
 
+
 def clear_console():
     os.system('cls' if os.name == 'nt' else 'clear')
 

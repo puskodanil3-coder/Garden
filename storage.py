@@ -1,4 +1,5 @@
 import sqlite3
+from contextlib import closing
 from config import TABLE_WIDTH, print_success
 from utils import pause_and_clear, is_garden_empty, clear_console
 
@@ -7,8 +8,9 @@ def connecting_db():
     conn = sqlite3.connect('garden.db')
     return conn
 
+
 def init_db():
-    with connecting_db() as conn:
+    with closing(connecting_db()) as conn:
         conn.execute(
     """
     CREATE TABLE IF NOT EXISTS garden(
@@ -19,9 +21,51 @@ def init_db():
     )
     """
 )
+        conn.commit()
+
+
+def add_plant_in_db(name, quantity, date):
+    with closing(connecting_db()) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO garden (name, quantity, date) VALUES (?, ?, ?)",
+            (name, quantity, date)
+        )
+        conn.commit()
+
+
+def delete_plant_in_db(id_plant):
+    with closing(connecting_db()) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "DELETE FROM garden WHERE id = ?",
+            (id_plant,)
+        )
+        conn.commit()
+
+
+def update_name(up_name, plant_id):
+    with closing(connecting_db()) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE garden SET name = ? WHERE id = ?",
+            (up_name, plant_id)
+        )
+        conn.commit()
+
+
+def update_quantity(up_quantity, plant_id):
+    with closing(connecting_db()) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE garden SET quantity = ? WHERE id = ?",
+            (up_quantity, plant_id)
+        )
+        conn.commit()
+
 
 def load_garden():
-    with connecting_db() as conn:
+    with closing(connecting_db()) as conn:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         cursor.execute(
@@ -31,6 +75,7 @@ def load_garden():
         result = [dict(row) for row in list_tuple]
     return result
 
+
 def export_to_txt(garden):
     if is_garden_empty(garden, 'нечего экспортировать'):
         pause_and_clear()
@@ -39,7 +84,6 @@ def export_to_txt(garden):
         f.write('Список растений в саду:\n')
         f.write("-" * TABLE_WIDTH+ "\n")
         f.write(f"\n{'№':>3} {'Название':<20} {'Количество':>12} {'Дата':>12}\n")
-
         for number, plant in enumerate(garden, start=1):
             f.write(f"{number:>3} {plant['name']:<20} {plant['quantity']:>12} {plant['date']:>12}\n")
         f.write("-" * TABLE_WIDTH+ "\n")
