@@ -23,11 +23,12 @@ def add_plant():
     pause_and_clear()
 
 
-def search_plant(garden):
+def search_plant():
+    plant_list = load_garden()
     clear_console()
     plant_search = get_non_empty_string('\nКакое растение нужно найти?:', '\nНужно ввести название для поиска!')
     found = False
-    for plant in garden:
+    for plant in plant_list:
         if plant_search in plant['name']:
             print(f"{plant['name']} - {plant['quantity']} шт. (добавлено {plant['date']})")
             found = True
@@ -105,26 +106,28 @@ def edit_plant():
         pause_and_clear()
 
 
-def plants_statistics(garden):
+def plants_statistics():
+    plant_list = load_garden()
     clear_console()
-    if is_garden_empty(garden, 'Статистика недоступна: список растений пока пуст'):
+    if is_garden_empty(plant_list, 'Статистика недоступна: список растений пока пуст'):
         pause_and_clear()
         return True
-    length = len(garden)
+    length = len(plant_list)
     print(f'Количество всех видов растений в саду: {length} шт.')
-    total = sum(plant['quantity'] for plant in garden)
+    total = sum(plant['quantity'] for plant in plant_list)
     print(f'\nКоличество всех растений в саду: {total} шт.')
 
-    max_plant = max(garden, key=lambda plant: plant['quantity'])
+    max_plant = max(plant_list, key=lambda plant: plant['quantity'])
     print(f'\nСамое многочисленное растение в саду: {max_plant["name"]} - {max_plant["quantity"]} шт.')
  
-    min_plant = min(garden, key=lambda plant: plant['quantity'])
+    min_plant = min(plant_list, key=lambda plant: plant['quantity'])
     print(f'\nСамое малочисленное растение в саду: {min_plant["name"]} - {min_plant["quantity"]} шт.')
     pause_and_clear()
 
 
-def sort_plants(garden):
-    if is_garden_empty(garden, 'нечего сортировать'):
+def sort_plants():
+    plant_list = load_garden()
+    if is_garden_empty(plant_list, 'нечего сортировать'):
         pause_and_clear()
         return True
     clear_console()
@@ -141,13 +144,13 @@ def sort_plants(garden):
             continue
 
         if choice == 1:
-            sorted_garden = sorted(garden, key=lambda value: value['quantity'])
+            sorted_garden = sorted(plant_list, key=lambda value: value['quantity'])
         elif choice == 2:
-            sorted_garden = sorted(garden, reverse=True, key=lambda value: value['quantity'])
+            sorted_garden = sorted(plant_list, reverse=True, key=lambda value: value['quantity'])
         elif choice == 3:
-            sorted_garden = sorted(garden, key=lambda value: datetime.strptime(value['date'], '%d.%m.%Y'))
+            sorted_garden = sorted(plant_list, key=lambda value: datetime.strptime(value['date'], '%d.%m.%Y'))
         elif choice == 4:
-            sorted_garden = sorted(garden, reverse=True, key=lambda value: datetime.strptime(value['date'], '%d.%m.%Y'))
+            sorted_garden = sorted(plant_list, reverse=True, key=lambda value: datetime.strptime(value['date'], '%d.%m.%Y'))
         if sorted_garden:
             display_plants(sorted_garden)
             pause_and_clear()

@@ -76,26 +76,27 @@ def load_garden():
     return result
 
 
-def export_to_txt(garden):
-    if is_garden_empty(garden, 'нечего экспортировать'):
+def export_to_txt():
+    plant_list = load_garden()
+    if is_garden_empty(plant_list, 'нечего экспортировать'):
         pause_and_clear()
         return True
     with open('garden_report.txt', 'w', encoding='utf-8') as f:
         f.write('Список растений в саду:\n')
         f.write("-" * TABLE_WIDTH+ "\n")
         f.write(f"\n{'№':>3} {'Название':<20} {'Количество':>12} {'Дата':>12}\n")
-        for number, plant in enumerate(garden, start=1):
+        for number, plant in enumerate(plant_list, start=1):
             f.write(f"{number:>3} {plant['name']:<20} {plant['quantity']:>12} {plant['date']:>12}\n")
         f.write("-" * TABLE_WIDTH+ "\n")
-        length = len(garden)
+        length = len(plant_list)
         f.write(f'\nКоличество всех видов растений в саду: {length} шт.')
-        total = sum(plant['quantity'] for plant in garden)
+        total = sum(plant['quantity'] for plant in plant_list)
         f.write(f'\nКоличество всех растений в саду: {total} шт.')
 
-        max_plant = max(garden, key=lambda plant: plant['quantity'])
+        max_plant = max(plant_list, key=lambda plant: plant['quantity'])
         f.write(f'\nСамое многочисленное растение в саду: {max_plant["name"]} - {max_plant["quantity"]} шт.')
 
-        min_plant = min(garden, key=lambda plant: plant['quantity'])
+        min_plant = min(plant_list, key=lambda plant: plant['quantity'])
         f.write(f'\nСамое малочисленное растение в саду: {min_plant["name"]} - {min_plant["quantity"]} шт.')
         
     clear_console()
