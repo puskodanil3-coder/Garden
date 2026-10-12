@@ -1,7 +1,7 @@
-from storage import load_garden, export_to_txt, init_db
+from storage import export_to_txt, init_db
 from config import print_success, print_error
 from utils import get_int, clear_console, confirm_exit
-from garden import add_plant, search_plant, show_plants, delete_plant, edit_plant, plants_statistics, sort_plants 
+from garden import add_plant, search_plant, show_plants, delete_plant, edit_plant, plants_statistics, sort_plants
 
 
 def run():
