@@ -64,6 +64,87 @@ def update_quantity(up_quantity, plant_id):
         conn.commit()
 
 
+def search_plants_in_db(plant_search):
+    with closing(connecting_db()) as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, name, quantity, date FROM garden WHERE name LIKE ?",
+            ("%" + plant_search + "%",)
+        )
+        list_tuple = cursor.fetchall()
+        result = [dict(row) for row in list_tuple]
+    return result
+
+
+def length_and_total_plant():
+    with closing(connecting_db()) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT COUNT(*), SUM(quantity) FROM garden ",
+        )
+        result = cursor.fetchone()
+        length = result[0]
+        total = result[1]
+        return length, total
+
+
+def max_and_min_plant():
+    with closing(connecting_db()) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT name, MAX(quantity) FROM garden ",
+        )
+        result = cursor.fetchone()
+        plant_name_max = result[0]
+        plant_max = result[1]
+
+        cursor.execute(
+            "SELECT name, MIN(quantity) FROM garden ",
+        )
+        result = cursor.fetchone()
+        plant_name_min = result[0]
+        plant_min = result[1]
+        return plant_name_max, plant_max, plant_name_min, plant_min
+
+
+def sort_quantity_increase_and_decrease():
+    with closing(connecting_db()) as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, name, quantity, date FROM garden ORDER BY quantity ASC",
+        )
+        list_tuple = cursor.fetchall()
+        list_tuple_increase = [dict(row) for row in list_tuple]
+
+        cursor.execute(
+            "SELECT id, name, quantity, date FROM garden ORDER BY quantity DESC",
+        )
+        list_tuple = cursor.fetchall()
+        list_tuple_decrease = [dict(row) for row in list_tuple]
+        return list_tuple_increase, list_tuple_decrease
+
+
+def sort_date_increase_and_decrease():
+    with closing(connecting_db()) as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, name, quantity, date FROM garden ORDER BY substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2) ASC",
+        )
+        list_tuple = cursor.fetchall()
+        list_tuple_increase = [dict(row) for row in list_tuple]
+
+        cursor.execute(
+            "SELECT id, name, quantity, date FROM garden ORDER BY substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2) DESC",
+        )
+        list_tuple = cursor.fetchall()
+        list_tuple_decrease = [dict(row) for row in list_tuple]
+        return list_tuple_increase, list_tuple_decrease
+
+
+
 def load_garden():
     with closing(connecting_db()) as conn:
         conn.row_factory = sqlite3.Row
@@ -98,7 +179,7 @@ def export_to_txt():
 
         min_plant = min(plant_list, key=lambda plant: plant['quantity'])
         f.write(f'\nСамое малочисленное растение в саду: {min_plant["name"]} - {min_plant["quantity"]} шт.')
-        
+
     clear_console()
     print_success('Экспорт успешно завершен')
     pause_and_clear()
