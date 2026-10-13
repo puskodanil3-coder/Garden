@@ -1,7 +1,9 @@
-from storage import export_to_txt, init_db
+import sqlite3
+from reports import export_to_txt
+from db import init_db
 from config import print_success, print_error
 from utils import get_int, clear_console, confirm_exit
-from garden import add_plant, search_plant, show_plants, delete_plant, edit_plant, plants_statistics, sort_plants
+from garden_actions import add_plant, search_plant, show_plants, delete_plant, edit_plant, plants_statistics, sort_plants
 
 
 def run():
@@ -61,6 +63,9 @@ def run():
         clear_console()
         print_error('Программа прервана!')
         print_success('\nДанные сохранены.')
+    except sqlite3.Error as e:
+        clear_console()
+        print_error(f'Ошибка базы данных: {e}')
 
 
 if __name__ == '__main__':

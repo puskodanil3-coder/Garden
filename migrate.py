@@ -1,8 +1,9 @@
 import sqlite3
 import json
+from config import DB_PATH
 
 
-conn = sqlite3.connect("garden.db")
+conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
 
 cursor.execute(

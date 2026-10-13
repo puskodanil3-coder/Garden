@@ -1,7 +1,7 @@
 from datetime import datetime
 from config import print_info, TABLE_WIDTH, print_success, print_error
 from utils import clear_console, get_non_empty_string, get_positive_int, pause_and_clear, is_garden_empty, get_int
-from storage import load_garden, add_plant_in_db, delete_plant_in_db, update_name, update_quantity, search_plants_in_db, length_and_total_plant, max_and_min_plant, sort_quantity_increase_and_decrease, sort_date_increase_and_decrease
+from db import get_all_plants, insert_plant, delete_plant_by_id, update_plant_name, update_plant_quantity, search_plants_by_name, length_and_total_plant, max_and_min_plant, get_plants_sorted_by_quantity, get_plants_sorted_by_date
 
 
 def display_plants(plant_list):
@@ -18,7 +18,7 @@ def add_plant():
     plant_name = get_non_empty_string('\nВведите название растения: ', '\nВведите название для добавления растения!')
     plant_quantity = get_positive_int('\nВведите количество растений:', '\nНужно ввести количество растений!')
     today = datetime.today().strftime('%d.%m.%Y')
-    add_plant_in_db(plant_name, plant_quantity, today)
+    insert_plant(plant_name, plant_quantity, today)
     print_success('\nУспешно добавлено!')
     pause_and_clear()
 
@@ -26,7 +26,7 @@ def add_plant():
 def search_plant():
     clear_console()
     plant_search = get_non_empty_string('\nКакое растение нужно найти?:', '\nНужно ввести название для поиска!')
-    plant_list = search_plants_in_db(plant_search)
+    plant_list = search_plants_by_name(plant_search)
     found = False
     for plant in plant_list:
         print(f"{plant['name']} - {plant['quantity']} шт. (добавлено {plant['date']})")
@@ -38,7 +38,7 @@ def search_plant():
 
 def show_plants():
     clear_console()
-    plant_list = load_garden()
+    plant_list = get_all_plants()
     if not plant_list:
         print_info('\nСписок растений пока пуст')
     else:
@@ -48,7 +48,7 @@ def show_plants():
 
 def delete_plant():
     clear_console()
-    plant_list = load_garden()
+    plant_list = get_all_plants()
     if is_garden_empty(plant_list, 'нечего удалять'):
         pause_and_clear()
         return True
@@ -62,7 +62,7 @@ def delete_plant():
                 del_plants = get_non_empty_string('Уверены? (да/нет)', 'Введите "да" или "нет"!')
                 if del_plants == 'да':
                     deleted_name = plant['name']
-                    delete_plant_in_db(del_plant)
+                    delete_plant_by_id(del_plant)
                     print_success(f"Растение '{deleted_name}' удалено.")
                     pause_and_clear()
                     return
@@ -74,7 +74,7 @@ def delete_plant():
 
 def edit_plant():
     clear_console()
-    plant_list = load_garden()
+    plant_list = get_all_plants()
     if is_garden_empty(plant_list, 'нечего редактировать'):
         pause_and_clear()
         return True
@@ -89,13 +89,13 @@ def edit_plant():
                 if action == 1:
                     up_name = get_non_empty_string('Введите новое названия растения:',
                                                'Нужно ввести новое названия растения!')
-                    update_name(up_name, plant_id)
+                    update_plant_name(up_name, plant_id)
                     print_success(f"Растение изменено на {up_name}.")
                     return
                 elif action == 2:
                     up_quantity = get_positive_int('Введите новое количество растения:',
                                                '\nНужно ввести количество растений!')
-                    update_quantity(up_quantity, plant_id)
+                    update_plant_quantity(up_quantity, plant_id)
                     print_success(f"Количество растения изменено на {up_quantity}")
                     return
                 else:
@@ -106,29 +106,23 @@ def edit_plant():
 
 
 def plants_statistics():
-    plant_list = load_garden()
+    plant_list = get_all_plants()
     clear_console()
     if is_garden_empty(plant_list, 'Статистика недоступна: список растений пока пуст'):
         pause_and_clear()
         return True
-    result_length_and_total = length_and_total_plant()
-    length = result_length_and_total[0]
-    total = result_length_and_total[1]
+    length, total = length_and_total_plant()
     print(f'Количество всех видов растений в саду: {length} шт.')
     print(f'\nКоличество всех растений в саду: {total} шт.')
 
-    result_max_and_min = max_and_min_plant()
-    plant_name_max = result_max_and_min[0]
-    plant_max = result_max_and_min[1]
-    plant_name_min = result_max_and_min[2]
-    plant_min = result_max_and_min[3]
+    plant_name_max, plant_max, plant_name_min, plant_min = max_and_min_plant()
     print(f'\nСамое многочисленное растение в саду: {plant_name_max} - {plant_max} шт.')
     print(f'\nСамое малочисленное растение в саду: {plant_name_min} - {plant_min} шт.')
     pause_and_clear()
 
 
 def sort_plants():
-    plant_list = load_garden()
+    plant_list = get_all_plants()
     if is_garden_empty(plant_list, 'нечего сортировать'):
         pause_and_clear()
         return True
@@ -145,8 +139,8 @@ def sort_plants():
             print_error('Ошибка: выберите число от 1 до 4')
             continue
 
-        plants_increase_quantity, plants_decrease_quantity = sort_quantity_increase_and_decrease()
-        plants_increase_date, plants_decrease_date = sort_date_increase_and_decrease()
+        plants_increase_quantity, plants_decrease_quantity = get_plants_sorted_by_quantity()
+        plants_increase_date, plants_decrease_date = get_plants_sorted_by_date()
         if choice == 1:
             sorted_garden = plants_increase_quantity
         elif choice == 2:
